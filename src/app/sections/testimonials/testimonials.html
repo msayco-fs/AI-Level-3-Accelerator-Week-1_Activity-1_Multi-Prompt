@@ -1,0 +1,94 @@
+<!-- ============================================================
+     TESTIMONIALS — snap carousel on mobile, grid from md up
+     ============================================================ -->
+<section class="section-y bg-white" aria-labelledby="reviews-heading">
+  <div class="shell">
+    <header class="max-w-2xl" appReveal>
+      <p class="eyebrow text-accent-600">Reviews</p>
+      <h2
+        id="reviews-heading"
+        class="mt-4 font-display text-display-md font-semibold text-primary-600"
+      >
+        What the regulars say
+      </h2>
+      <p class="mt-5 text-base/relaxed text-ink-muted">
+        Unedited, and yes, we asked permission first.
+      </p>
+    </header>
+  </div>
+
+  <!-- The row breaks out of `shell` on mobile so cards can bleed to the
+       viewport edge, then returns to a contained grid at md. -->
+  <div class="mt-12">
+    <ul
+      class="snap-row shell md:grid-cols-2 lg:grid-cols-3"
+      tabindex="0"
+      role="group"
+      aria-labelledby="reviews-heading"
+      aria-describedby="reviews-hint"
+    >
+      @for (review of reviews; track review.id; let i = $index) {
+        <li class="flex" appReveal [revealDelay]="(i % 3) * 110">
+          <figure class="card card-hover grow p-6">
+            <!-- Rating -->
+            <p class="flex items-center gap-0.5 text-secondary-500">
+              <span class="sr-only">Rated {{ review.rating }} out of 5</span>
+              @for (star of stars; track star) {
+                <svg
+                  viewBox="0 0 20 20"
+                  class="size-4"
+                  [attr.fill]="star <= review.rating ? 'currentColor' : 'none'"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M10 1.8l2.5 5.3 5.7.8-4.1 4 1 5.7L10 15l-5.1 2.6 1-5.7-4.1-4 5.7-.8L10 1.8Z"
+                  />
+                </svg>
+              }
+            </p>
+
+            <blockquote class="mt-4 grow">
+              <p class="text-sm/relaxed text-ink-muted">{{ review.quote }}</p>
+            </blockquote>
+
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-hairline pt-5">
+              @if (review.avatar) {
+                <span class="size-10 shrink-0 overflow-hidden rounded-full">
+                  <app-media-frame
+                    folder="people"
+                    [src]="review.avatar"
+                    [alt]="'Portrait of ' + review.author"
+                    [width]="128"
+                    [height]="128"
+                  />
+                </span>
+              } @else {
+                <span
+                  class="grid size-10 shrink-0 place-items-center rounded-full bg-primary-600 text-xs font-bold text-secondary-400"
+                  aria-hidden="true"
+                >
+                  {{ initials(review.author) }}
+                </span>
+              }
+
+              <span>
+                <span class="block text-sm font-semibold text-primary-600">
+                  {{ review.author }}
+                </span>
+                <span class="block text-xs text-ink-muted">{{ review.meta }}</span>
+              </span>
+            </figcaption>
+          </figure>
+        </li>
+      }
+    </ul>
+
+    <!-- tabindex on the row makes it keyboard-scrollable; this tells the user
+         so, and is hidden from view on desktop where it does not apply. -->
+    <p id="reviews-hint" class="shell mt-5 text-xs text-ink-muted md:sr-only">
+      Swipe, or use the arrow keys, to see more reviews.
+    </p>
+  </div>
+</section>

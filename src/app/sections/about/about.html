@@ -1,0 +1,57 @@
+<!-- ============================================================
+     ABOUT — brand story, dark band to break up the white sections
+     ============================================================ -->
+<section id="about" class="section-y bg-primary-600 text-white" aria-labelledby="about-heading">
+  <div class="shell grid gap-14 lg:grid-cols-12 lg:gap-16">
+    <!-- Image column -->
+    <div class="lg:col-span-5" appReveal>
+      <div
+        class="relative aspect-3/4 overflow-hidden rounded-[2rem] border border-secondary-400/25 bg-primary-700"
+      >
+        <app-media-frame
+          folder="gallery"
+          src=""
+          alt="The Matcharap counter on Aurora Boulevard, brass espresso machine and walnut shelving."
+          [width]="900"
+          [height]="1200"
+        />
+      </div>
+    </div>
+
+    <!-- Copy column -->
+    <div class="lg:col-span-7" appReveal [revealDelay]="120">
+      <p class="eyebrow text-secondary-400">Our story</p>
+      <h2
+        id="about-heading"
+        class="mt-4 max-w-xl font-display text-display-md font-semibold text-white"
+      >
+        We opened because nobody would sell us a decent bowl of matcha
+      </h2>
+
+      <div class="mt-6 max-w-xl space-y-4 text-base/relaxed text-primary-100">
+        <p>
+          In 2019 we were two baristas and one very stubborn tea obsessive renting a narrow unit
+          on Aurora Boulevard. The plan was small: source leaf we actually believed in, learn to
+          whisk it properly, and refuse to sweeten our way out of a bad cup.
+        </p>
+        <p>
+          That is still the whole plan. The espresso programme came later, for the mornings when
+          tea will not do, and the kitchen came after that because people kept asking what they
+          could eat. Everything else we have left alone.
+        </p>
+      </div>
+
+      <!-- Pillars -->
+      <dl class="mt-12 grid gap-8 sm:grid-cols-3">
+        @for (pillar of pillars; track pillar.title) {
+          <div>
+            <dt class="font-display text-lg font-semibold text-secondary-400">
+              {{ pillar.title }}
+            </dt>
+            <dd class="mt-2 text-sm/relaxed text-primary-200">{{ pillar.body }}</dd>
+          </div>
+        }
+      </dl>
+    </div>
+  </div>
+</section>

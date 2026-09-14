@@ -1,0 +1,479 @@
+/* ==========================================================================
+   MATCHARAP — COMPONENT CLASSES
+   --------------------------------------------------------------------------
+   Recurring UI patterns live here instead of being re-typed as long utility
+   strings in every template. Written as plain CSS against the @theme tokens
+   (not @apply) so the cascade stays predictable and the output stays small.
+   ========================================================================== */
+
+@layer components {
+  /* ------------------------------ BUTTONS ------------------------------ */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 9999px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 180ms var(--ease-brand),
+      border-color 180ms var(--ease-brand),
+      color 180ms var(--ease-brand),
+      transform 180ms var(--ease-brand);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-sm {
+    padding: 0.625rem 1.125rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-lg {
+    padding: 1rem 2rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  /* Gold — primary call to action */
+  .btn-gold {
+    background-color: var(--color-secondary-400);
+    color: var(--color-primary-800);
+  }
+  .btn-gold:hover:not(:disabled) {
+    background-color: var(--color-secondary-300);
+  }
+
+  /* Slate — secondary call to action */
+  .btn-primary {
+    background-color: var(--color-primary-600);
+    color: var(--color-canvas);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-700);
+  }
+
+  /* Oxblood — destructive or high-urgency */
+  .btn-accent {
+    background-color: var(--color-accent-600);
+    color: var(--color-canvas);
+  }
+  .btn-accent:hover:not(:disabled) {
+    background-color: var(--color-accent-700);
+  }
+
+  /* Outline on light backgrounds */
+  .btn-outline {
+    border-color: var(--color-hairline);
+    color: var(--color-primary-600);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-primary-600);
+    background-color: var(--color-primary-50);
+  }
+
+  /* Outline on dark backgrounds */
+  .btn-invert {
+    border-color: color-mix(in srgb, var(--color-primary-200) 40%, transparent);
+    color: var(--color-canvas);
+  }
+  .btn-invert:hover:not(:disabled) {
+    border-color: var(--color-secondary-400);
+    color: var(--color-secondary-400);
+  }
+
+  /* Circular icon-only button */
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition:
+      background-color 180ms var(--ease-brand),
+      border-color 180ms var(--ease-brand),
+      color 180ms var(--ease-brand);
+  }
+
+  /* ---------------------------- TOGGLE CHIPS ---------------------------- */
+
+  /* Filter pills. State is driven by aria-pressed so the DOM stays the
+     single source of truth for both styling and assistive tech. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-hairline);
+    background-color: var(--color-canvas);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 180ms var(--ease-brand),
+      border-color 180ms var(--ease-brand),
+      color 180ms var(--ease-brand);
+  }
+
+  .chip:hover {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-600);
+  }
+
+  /* Selected state keys off whichever ARIA attribute matches the widget
+     pattern: aria-pressed for toggle buttons, aria-checked for radios. */
+  .chip[aria-pressed='true'],
+  .chip[aria-checked='true'] {
+    background-color: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    color: var(--color-canvas);
+    font-weight: 600;
+  }
+
+  /* Non-interactive descriptor tag (dietary markers, sizes) */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 0.375rem;
+    background-color: var(--color-secondary-50);
+    border: 1px solid var(--color-secondary-200);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-secondary-800);
+    white-space: nowrap;
+  }
+
+  /* Merchandising ribbon */
+  .ribbon {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-canvas);
+    background-color: var(--color-accent-600);
+  }
+  .ribbon-new {
+    background-color: var(--color-primary-600);
+  }
+  .ribbon-seasonal {
+    background-color: var(--color-secondary-600);
+  }
+
+  /* ------------------------------- CARDS ------------------------------- */
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-card);
+    transition:
+      box-shadow 220ms var(--ease-brand),
+      border-color 220ms var(--ease-brand),
+      transform 220ms var(--ease-brand);
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-lifted);
+    border-color: var(--color-secondary-300);
+    transform: translateY(-3px);
+  }
+
+  /* --------------------------- FORM CONTROLS --------------------------- */
+
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary-600);
+  }
+
+  .field {
+    width: 100%;
+    padding: 0.8125rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-hairline);
+    background-color: var(--color-canvas);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--color-primary-700);
+    transition:
+      border-color 160ms var(--ease-brand),
+      box-shadow 160ms var(--ease-brand);
+  }
+
+  .field::placeholder {
+    color: var(--color-primary-300);
+  }
+
+  .field:hover:not(:disabled) {
+    border-color: var(--color-primary-300);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-400) 18%, transparent);
+  }
+
+  /* Error state is keyed off aria-invalid, which the form sets anyway —
+     avoids a second parallel class to keep in sync. */
+  .field[aria-invalid='true'] {
+    border-color: var(--color-accent-500);
+  }
+  .field[aria-invalid='true']:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-500) 18%, transparent);
+  }
+
+  .field-error {
+    display: flex;
+    align-items: center;
+    gap: 0.3125rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-accent-600);
+  }
+
+  /* --------------------------- QUANTITY STEPPER ------------------------ */
+
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-hairline);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .stepper button {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-primary-600);
+    cursor: pointer;
+    transition: background-color 140ms var(--ease-brand);
+  }
+  .stepper button:hover:not(:disabled) {
+    background-color: var(--color-primary-50);
+  }
+  .stepper button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .stepper output {
+    min-width: 2rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-primary-700);
+  }
+
+  /* ----------------------------- SECTION BITS -------------------------- */
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  /* Every price renders in the sans face with tabular figures: columns align,
+     and it keeps the peso sign out of Fraunces (which ships latin only). */
+  .price {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* ------------------------------- DRAWER ------------------------------ */
+
+  /* Classes consumed by Angular's native `animate.enter` / `animate.leave`
+     bindings. Angular waits for the animation to finish before removing the
+     node, so leave transitions work without the animations package. */
+  .scrim-enter {
+    animation: fade-in 260ms var(--ease-brand) both;
+  }
+  .scrim-leave {
+    animation: fade-in 200ms var(--ease-brand) reverse both;
+  }
+
+  .panel-enter {
+    animation: slide-in-right 340ms var(--ease-brand) both;
+  }
+  .panel-leave {
+    animation: slide-in-right 260ms var(--ease-brand) reverse both;
+  }
+
+  .panel-left-enter {
+    animation: slide-in-left 340ms var(--ease-brand) both;
+  }
+  .panel-left-leave {
+    animation: slide-in-left 260ms var(--ease-brand) reverse both;
+  }
+
+  .zoom-enter {
+    animation: zoom-in 280ms var(--ease-brand) both;
+  }
+  .zoom-leave {
+    animation: zoom-in 200ms var(--ease-brand) reverse both;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes zoom-in {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* --------------------------- SCROLL REVEAL --------------------------- */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 700ms var(--ease-brand) var(--reveal-delay, 0ms),
+      transform 700ms var(--ease-brand) var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ----------------------- SNAP CAROUSEL (MOBILE) ---------------------- */
+
+  .snap-row {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* Bleed to the viewport edges so cards can sit flush while the first and
+       last still align with the page gutter. */
+    scroll-padding-inline: 1.25rem;
+  }
+
+  .snap-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .snap-row > * {
+    scroll-snap-align: start;
+    flex: 0 0 min(85%, 22rem);
+  }
+
+  @media (min-width: 768px) {
+    .snap-row {
+      display: grid;
+      overflow: visible;
+      gap: 1.5rem;
+    }
+    .snap-row > * {
+      flex: initial;
+    }
+  }
+
+  /* Cart count badge on the header trigger */
+  .cart-badge {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.25rem;
+    display: grid;
+    place-items: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding-inline: 0.25rem;
+    border-radius: 9999px;
+    background-color: var(--color-secondary-400);
+    color: var(--color-primary-800);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    animation: badge-pop 300ms var(--ease-brand);
+  }
+
+  @keyframes badge-pop {
+    0% {
+      transform: scale(0.5);
+    }
+    60% {
+      transform: scale(1.15);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+}

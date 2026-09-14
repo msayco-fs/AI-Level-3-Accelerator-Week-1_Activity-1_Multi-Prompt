@@ -1,0 +1,88 @@
+<!-- ============================================================
+     MENU — signal-driven category filter + item cards
+     ============================================================ -->
+<section id="menu" class="section-y bg-white" aria-labelledby="menu-heading">
+  <div class="shell">
+    <!-- Section header -->
+    <header class="max-w-2xl" appReveal>
+      <p class="eyebrow text-accent-600">The Menu</p>
+      <h2
+        id="menu-heading"
+        class="mt-4 font-display text-display-md font-semibold text-primary-600"
+      >
+        Everything is made to order
+      </h2>
+      <p class="mt-5 text-base/relaxed text-ink-muted">
+        Twenty-two things, done properly, instead of eighty done adequately. Prices in
+        Philippine pesos, all sizes brewed to the same strength.
+      </p>
+    </header>
+
+    <!-- Filter: toggle-button group, not a tablist. A real tablist needs
+         matching tabpanels and manual arrow-key management; these buttons
+         reduce a single list, so aria-pressed is the honest pattern. -->
+    <div class="mt-10 flex flex-wrap items-center gap-2">
+      <h3 class="sr-only" id="menu-filter-label">Filter menu by category</h3>
+      <div class="flex flex-wrap gap-2" role="group" aria-labelledby="menu-filter-label">
+        <button
+          type="button"
+          class="chip"
+          [attr.aria-pressed]="activeFilter() === 'all'"
+          (click)="setFilter('all')"
+        >
+          Everything
+        </button>
+        @for (cat of categories; track cat.id) {
+          <button
+            type="button"
+            class="chip"
+            [attr.aria-pressed]="activeFilter() === cat.id"
+            (click)="setFilter(cat.id)"
+          >
+            {{ cat.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Result count, announced on change -->
+      <p class="ml-auto text-xs text-ink-muted" aria-live="polite">
+        Showing {{ visibleCount() }} items
+      </p>
+    </div>
+
+    <!-- Grouped item lists -->
+    @for (group of visibleGroups(); track group.category.id) {
+      <section class="mt-16" [attr.aria-labelledby]="'cat-' + group.category.id">
+        <div class="flex items-end justify-between gap-6 border-b border-hairline pb-4">
+          <div>
+            <h3
+              [id]="'cat-' + group.category.id"
+              class="font-display text-2xl font-semibold text-primary-600"
+            >
+              {{ group.category.label }}
+            </h3>
+            <p class="mt-1 text-sm text-ink-muted">{{ group.category.blurb }}</p>
+          </div>
+          <span class="eyebrow shrink-0 text-secondary-600">
+            {{ group.items.length }} items
+          </span>
+        </div>
+
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          @for (item of group.items; track item.id) {
+            <li class="flex" appReveal [revealDelay]="($index % 3) * 80">
+              <app-menu-item-card [item]="item" />
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- Allergen note: legally and practically important, easy to forget -->
+    <p class="mt-16 border-t border-hairline pt-8 text-xs/relaxed text-ink-muted">
+      Our kitchen handles nuts, dairy, gluten and soy in a shared space, so we cannot
+      guarantee any item is free from traces. Please tell the bar about allergies when you
+      order and we will talk you through the options.
+    </p>
+  </div>
+</section>

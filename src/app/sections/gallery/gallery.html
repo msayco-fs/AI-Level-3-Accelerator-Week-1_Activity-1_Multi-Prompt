@@ -1,0 +1,177 @@
+<!-- ============================================================
+     GALLERY — mixed-aspect grid + keyboard-navigable lightbox
+     ============================================================ -->
+<section class="section-y bg-secondary-50" aria-labelledby="gallery-heading">
+  <div class="shell">
+    <header class="max-w-2xl" appReveal>
+      <p class="eyebrow text-accent-600">The Shop</p>
+      <h2
+        id="gallery-heading"
+        class="mt-4 font-display text-display-md font-semibold text-primary-600"
+      >
+        A look around
+      </h2>
+      <p class="mt-5 text-base/relaxed text-ink-muted">
+        Twenty-four seats, one long communal table, and the best afternoon light on the block.
+      </p>
+    </header>
+
+    <ul
+      class="mt-12 grid auto-rows-[11rem] grid-cols-2 gap-4 sm:auto-rows-[13rem] lg:grid-cols-4"
+    >
+      @for (image of images; track image.id; let i = $index) {
+        <li [class]="spanFor[image.aspect]" appReveal [revealDelay]="(i % 4) * 90">
+          <!-- A real <button> wraps the figure: the tile is genuinely
+               actionable, so it must be tabbable and Enter/Space-activated
+               without re-implementing either. -->
+          <button
+            type="button"
+            class="group relative block h-full w-full overflow-hidden rounded-2xl bg-primary-600 text-left"
+            (click)="openLightbox(i)"
+            [attr.aria-label]="'View larger: ' + image.caption"
+          >
+            <figure class="h-full">
+              <app-media-frame
+                folder="gallery"
+                [src]="image.src"
+                [alt]="image.alt"
+                [width]="dimsFor[image.aspect].w"
+                [height]="dimsFor[image.aspect].h"
+                class="transition-transform duration-700 ease-(--ease-brand) group-hover:scale-105"
+              />
+
+              <figcaption
+                class="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-primary-900/85 via-primary-900/35 to-transparent p-4 pt-12"
+              >
+                <span class="text-sm font-medium text-white">{{ image.caption }}</span>
+              </figcaption>
+            </figure>
+
+            <!-- Zoom affordance -->
+            <span
+              class="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-primary-800/70 text-secondary-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                class="size-4"
+              >
+                <circle cx="8.5" cy="8.5" r="5.5" />
+                <path d="m12.5 12.5 4 4M8.5 6v5M6 8.5h5" stroke-linecap="round" />
+              </svg>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== LIGHTBOX ============================== -->
+@if (current(); as image) {
+  <div
+    class="fixed inset-0 z-100 flex flex-col bg-primary-950/95 backdrop-blur-md"
+    animate.enter="scrim-enter"
+    animate.leave="scrim-leave"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Gallery viewer"
+    appFocusTrap
+  >
+    <!-- Toolbar -->
+    <div class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-6">
+      <p class="price text-xs tracking-[0.2em] text-secondary-400 uppercase">
+        {{ (openIndex() ?? 0) + 1 }} / {{ images.length }}
+      </p>
+      <button
+        type="button"
+        class="icon-btn border-primary-300/30 text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+        (click)="closeLightbox()"
+        aria-label="Close gallery viewer"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Stage -->
+    <div class="flex min-h-0 grow items-center gap-2 px-2 sm:gap-4 sm:px-6">
+      <button
+        type="button"
+        class="icon-btn shrink-0 border-primary-300/30 text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+        (click)="previous()"
+        aria-label="Previous image"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="m14 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <figure class="flex min-h-0 grow flex-col items-center justify-center gap-4">
+        <div
+          class="flex min-h-0 w-full grow items-center justify-center overflow-hidden rounded-2xl"
+        >
+          <!-- Keyed on the image id so Angular swaps the element and replays
+               the zoom animation on every navigation. -->
+          @if (image.id) {
+            <app-media-frame
+              folder="gallery"
+              [src]="image.src"
+              [alt]="image.alt"
+              [width]="1600"
+              [height]="1200"
+              [priority]="true"
+              class="max-h-full"
+              animate.enter="zoom-enter"
+            />
+          }
+        </div>
+
+        <figcaption class="shrink-0 pb-2 text-center">
+          <p class="font-display text-lg font-semibold text-white">{{ image.caption }}</p>
+          <p class="mx-auto mt-1 max-w-xl text-xs/relaxed text-primary-300">{{ image.alt }}</p>
+        </figcaption>
+      </figure>
+
+      <button
+        type="button"
+        class="icon-btn shrink-0 border-primary-300/30 text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+        (click)="next()"
+        aria-label="Next image"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="m10 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="shrink-0 pb-4 text-center text-[0.6875rem] text-primary-400 sm:pb-6">
+      Use the arrow keys to browse, Escape to close.
+    </p>
+  </div>
+}

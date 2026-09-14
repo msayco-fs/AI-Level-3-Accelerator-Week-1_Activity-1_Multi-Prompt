@@ -1,0 +1,136 @@
+<!-- ============================================================
+     MENU ITEM CARD
+     ============================================================ -->
+<article class="card card-hover group overflow-hidden" [class.opacity-70]="!item().available">
+  <!-- Image -->
+  <div class="relative aspect-4/3 overflow-hidden bg-primary-600">
+    <app-media-frame
+      folder="menu"
+      [src]="item().image"
+      [alt]="item().name"
+      [width]="800"
+      [height]="600"
+      class="transition-transform duration-500 ease-(--ease-brand) group-hover:scale-105"
+    />
+
+    @if (item().badge) {
+      <span [class]="badgeClass() + ' absolute top-3 left-3'">{{ item().badge }}</span>
+    }
+
+    @if (!item().available) {
+      <div
+        class="absolute inset-0 grid place-items-center bg-primary-800/70 backdrop-blur-[2px]"
+      >
+        <span
+          class="rounded-full border border-secondary-400/60 px-4 py-1.5 text-xs font-bold tracking-[0.16em] text-secondary-400 uppercase"
+        >
+          Sold out today
+        </span>
+      </div>
+    }
+
+    @if (inCart() > 0) {
+      <span
+        class="absolute top-3 right-3 grid size-7 place-items-center rounded-full bg-secondary-400 text-xs font-bold text-primary-800"
+      >
+        <span class="sr-only">In your order:</span>{{ inCart() }}
+      </span>
+    }
+  </div>
+
+  <!-- Body -->
+  <div class="flex grow flex-col p-5">
+    <div class="flex items-start justify-between gap-3">
+      <h4 class="font-display text-lg leading-snug font-semibold text-primary-600">
+        {{ item().name }}
+      </h4>
+      <p class="price shrink-0 text-right">
+        <span class="text-base font-bold text-accent-600">{{ currentPrice() | peso }}</span>
+        @if (canPickSize()) {
+          <span class="block text-[0.6875rem] text-ink-muted">
+            {{ size() === 'large' ? 'large' : 'regular' }}
+          </span>
+        }
+      </p>
+    </div>
+
+    <p class="mt-2 text-sm/relaxed text-ink-muted">{{ item().description }}</p>
+
+    <!-- Dietary tags -->
+    @if (tagLabels().length) {
+      <ul class="mt-3.5 flex flex-wrap gap-1.5">
+        @for (label of tagLabels(); track label) {
+          <li class="tag">{{ label }}</li>
+        }
+      </ul>
+    }
+
+    <!-- Caffeine, if known -->
+    @if (item().caffeineMg !== undefined) {
+      <p class="mt-3 text-[0.6875rem] text-primary-300">
+        approx. {{ item().caffeineMg }}mg caffeine
+      </p>
+    }
+
+    <!-- Controls pinned to the bottom so cards of differing copy length align -->
+    <div class="mt-auto pt-5">
+      @if (canPickSize()) {
+        <!-- Size selector: radiogroup, because the choice is exclusive and
+             arrow-key navigable for free. -->
+        <div
+          class="mb-3 flex gap-1.5"
+          role="radiogroup"
+          [attr.aria-label]="'Size for ' + item().name"
+        >
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="size() === 'regular'"
+            [attr.tabindex]="size() === 'regular' ? 0 : -1"
+            class="chip btn-sm flex-1 justify-center"
+            (click)="selectSize('regular')"
+          >
+            Regular
+          </button>
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="size() === 'large'"
+            [attr.tabindex]="size() === 'large' ? 0 : -1"
+            class="chip btn-sm flex-1 justify-center"
+            (click)="selectSize('large')"
+          >
+            Large +{{ item().largeUpcharge | peso }}
+          </button>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="btn btn-block btn-sm"
+        [class.btn-primary]="!justAdded()"
+        [class.btn-gold]="justAdded()"
+        [disabled]="!item().available"
+        (click)="addToCart()"
+      >
+        @if (justAdded()) {
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            class="size-4"
+            aria-hidden="true"
+          >
+            <path d="m4 10.5 4 4 8-9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Added to order
+        } @else if (!item().available) {
+          Unavailable
+        } @else {
+          Add to order
+        }
+      </button>
+    </div>
+  </div>
+</article>

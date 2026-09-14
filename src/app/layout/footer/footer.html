@@ -1,0 +1,79 @@
+<!-- ============================================================
+     SITE FOOTER — address, hours, nav, socials
+     ============================================================ -->
+<footer class="bg-primary-800 text-primary-100">
+  <div class="shell grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-4 lg:py-20">
+    <!-- Brand -->
+    <div class="lg:col-span-2">
+      <p class="font-display text-2xl font-semibold text-white">{{ shop.name }}</p>
+      <p class="mt-3 max-w-sm text-sm/relaxed text-primary-200">{{ shop.tagline }}</p>
+
+      <ul class="mt-6 flex gap-3">
+        @for (social of shop.socials; track social.label) {
+          <li>
+            <a
+              [href]="social.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block rounded-full border border-primary-300/30 px-4 py-1.5 text-xs font-medium transition-colors hover:border-secondary-400 hover:text-secondary-400"
+            >
+              {{ social.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Visit -->
+    <div>
+      <h2 class="font-sans text-xs font-bold tracking-[0.18em] text-secondary-400 uppercase">
+        Visit
+      </h2>
+      <address class="mt-4 space-y-1 text-sm/relaxed not-italic text-primary-200">
+        @for (line of shop.addressLines; track line) {
+          <p>{{ line }}</p>
+        }
+      </address>
+      <p class="mt-4 space-y-1 text-sm">
+        <a [href]="'tel:' + shop.phone" class="block hover:text-secondary-400">
+          {{ shop.phoneDisplay }}
+        </a>
+        <a [href]="'mailto:' + shop.email" class="block hover:text-secondary-400">
+          {{ shop.email }}
+        </a>
+      </p>
+    </div>
+
+    <!-- Hours + nav -->
+    <div>
+      <h2 class="font-sans text-xs font-bold tracking-[0.18em] text-secondary-400 uppercase">
+        Hours
+      </h2>
+      <dl class="mt-4 space-y-2 text-sm">
+        @for (slot of shop.hours; track slot.days) {
+          <div>
+            <dt class="text-primary-200">{{ slot.days }}</dt>
+            <dd class="text-white">{{ slot.hours }}</dd>
+          </div>
+        }
+      </dl>
+    </div>
+  </div>
+
+  <div class="border-t border-primary-700">
+    <div
+      class="shell flex flex-col gap-4 py-6 text-xs text-primary-300 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>&copy; {{ year }} {{ shop.name }}. All rights reserved.</p>
+      <nav aria-label="Footer">
+        <ul class="flex flex-wrap gap-x-5 gap-y-2">
+          @for (link of links; track link.id) {
+            <li>
+              <a [href]="'#' + link.id" class="hover:text-secondary-400">{{ link.label }}</a>
+            </li>
+          }
+        </ul>
+      </nav>
+    </div>
+  </div>
+</footer>

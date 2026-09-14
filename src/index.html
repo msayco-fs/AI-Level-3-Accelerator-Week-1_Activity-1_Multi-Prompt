@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- ================= PRIMARY META ================= -->
+    <title>Matcharap — Ceremonial Matcha &amp; Specialty Coffee</title>
+    <meta
+      name="description"
+      content="Matcharap is a matcha and specialty coffee bar. Stone-milled ceremonial matcha, single-origin espresso and small-batch pastries. Order online for pickup."
+    />
+    <meta name="author" content="Matcharap" />
+    <meta name="theme-color" content="#37435a" />
+    <link rel="canonical" href="https://matcharap.example/" />
+
+    <!-- ================= SOCIAL ================= -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Matcharap" />
+    <meta property="og:title" content="Matcharap — Ceremonial Matcha &amp; Specialty Coffee" />
+    <meta
+      property="og:description"
+      content="Stone-milled ceremonial matcha, single-origin espresso and small-batch pastries. Order online for pickup."
+    />
+    <meta property="og:image" content="/assets/images/og-cover.jpg" />
+    <meta property="og:url" content="https://matcharap.example/" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ================= ICONS ================= -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
+
+    <!-- Fonts: self-hosted + preloaded (no third-party connection, no
+         render-blocking stylesheet). The latin-ext sans file is not preloaded
+         — it only carries ₱ and friends, none of which are above the fold. -->
+    <link
+      rel="preload"
+      href="/assets/fonts/fraunces-latin-opsz-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/assets/fonts/plus-jakarta-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- ================= STRUCTURED DATA ================= -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CafeOrCoffeeShop",
+        "name": "Matcharap",
+        "description": "Matcha and specialty coffee bar serving stone-milled ceremonial matcha, single-origin espresso and small-batch pastries.",
+        "servesCuisine": ["Coffee", "Matcha", "Pastries"],
+        "priceRange": "₱₱",
+        "url": "https://matcharap.example/",
+        "telephone": "+63-917-000-0000",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "24 Aurora Boulevard",
+          "addressLocality": "Quezon City",
+          "addressRegion": "Metro Manila",
+          "postalCode": "1112",
+          "addressCountry": "PH"
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "07:00",
+            "closes": "21:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Saturday", "Sunday"],
+            "opens": "08:00",
+            "closes": "22:00"
+          }
+        ]
+      }
+    </script>
+  </head>
+
+  <body>
+    <app-root>
+      <!-- Pre-hydration paint: prevents a blank white flash before Angular boots -->
+      <div
+        style="
+          display: grid;
+          place-items: center;
+          min-height: 100svh;
+          background: #37435a;
+          color: #c8b373;
+          font-family: Georgia, serif;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          font-size: 0.75rem;
+        "
+      >
+        Matcharap
+      </div>
+    </app-root>
+
+    <noscript>
+      <div style="padding: 2rem; font-family: system-ui, sans-serif; color: #37435a">
+        <h1>Matcharap</h1>
+        <p>
+          This site needs JavaScript for online ordering. Please enable it, or call us at
+          <a href="tel:+639170000000">+63 917 000 0000</a> to place an order.
+        </p>
+      </div>
+    </noscript>
+  </body>
+</html>

@@ -1,0 +1,411 @@
+<!-- ============================================================
+     CART DRAWER — review → details → sent
+     Focus trap, scroll lock and enter/leave animation land in Phase 3.
+     ============================================================ -->
+@if (cart.isOpen()) {
+  <!-- Scrim -->
+  <div
+    class="fixed inset-0 z-90 bg-primary-900/55 backdrop-blur-sm"
+    animate.enter="scrim-enter"
+    animate.leave="scrim-leave"
+    (click)="close()"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Panel -->
+  <div
+    class="fixed inset-y-0 right-0 z-100 flex w-full max-w-md flex-col bg-white shadow-lifted"
+    animate.enter="panel-enter"
+    animate.leave="panel-leave"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cart-title"
+    appFocusTrap
+  >
+    <!-- Header -->
+    <header
+      class="flex shrink-0 items-center justify-between gap-4 border-b border-hairline bg-primary-600 px-5 py-4"
+    >
+      <div>
+        <h2 id="cart-title" class="font-display text-lg font-semibold text-white">
+          @switch (step()) {
+            @case ('details') {
+              Your details
+            }
+            @case ('sent') {
+              Order sent
+            }
+            @default {
+              Your order
+            }
+          }
+        </h2>
+        @if (step() === 'review' && !cart.isEmpty()) {
+          <p class="mt-0.5 text-xs text-primary-200">
+            {{ cart.totals().itemCount }} item{{ cart.totals().itemCount === 1 ? '' : 's' }}
+          </p>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="icon-btn border-primary-300/30 text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+        (click)="close()"
+        aria-label="Close your order"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- ============================== STEP: SENT ============================== -->
+    @if (step() === 'sent') {
+      <div class="flex grow flex-col items-center justify-center gap-5 px-8 text-center">
+        <span
+          class="grid size-16 place-items-center rounded-full bg-secondary-100 text-secondary-700"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="size-8"
+          >
+            <path d="m5 13 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+
+        <div>
+          <h3 class="font-display text-2xl font-semibold text-primary-600">
+            Reference {{ reference() }}
+          </h3>
+          <p class="mt-3 text-sm/relaxed text-ink-muted">
+            Your order has been handed to
+            {{ channel() === 'whatsapp' ? 'WhatsApp' : 'your email client' }}. Send the
+            message to confirm — we start making it the moment it arrives.
+          </p>
+        </div>
+
+        <p class="rounded-xl bg-secondary-50 px-4 py-3 text-xs/relaxed text-secondary-800">
+          Nothing came up? Call us directly on
+          <a [href]="'tel:' + shop.phone" class="font-semibold underline">
+            {{ shop.phoneDisplay }}
+          </a>
+          and quote {{ reference() }}.
+        </p>
+
+        <button type="button" class="btn btn-outline btn-sm" (click)="close()">
+          Back to the menu
+        </button>
+      </div>
+    }
+
+    <!-- ============================= STEP: REVIEW ============================= -->
+    @else if (step() === 'review') {
+      @if (cart.isEmpty()) {
+        <div class="flex grow flex-col items-center justify-center gap-4 px-8 text-center">
+          <span
+            class="grid size-16 place-items-center rounded-full bg-primary-50 text-primary-300"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              class="size-8"
+            >
+              <path d="M4 7h16l-1.3 11.2a2 2 0 0 1-2 1.8H7.3a2 2 0 0 1-2-1.8L4 7Z" />
+              <path d="M9 7V5.5a3 3 0 0 1 6 0V7" />
+            </svg>
+          </span>
+          <h3 class="font-display text-xl font-semibold text-primary-600">Nothing here yet</h3>
+          <p class="max-w-xs text-sm/relaxed text-ink-muted">
+            Add a drink or something from the kitchen and it will show up here.
+          </p>
+          <button type="button" class="btn btn-gold btn-sm" (click)="close()">
+            Browse the menu
+          </button>
+        </div>
+      } @else {
+        <!-- Lines -->
+        <ul class="grow divide-y divide-hairline overflow-y-auto overscroll-contain px-5">
+          @for (line of cart.lines(); track line.lineId) {
+            <li class="flex gap-3 py-4">
+              <div class="grow">
+                <p class="text-sm font-semibold text-primary-600">
+                  {{ line.name }}
+                  @if (line.size === 'large') {
+                    <span class="tag ml-1.5">large</span>
+                  }
+                </p>
+                <p class="price mt-0.5 text-xs text-ink-muted">
+                  {{ line.unitPrice | peso }} each
+                </p>
+                @if (line.note) {
+                  <p class="mt-1 text-xs text-secondary-700">↳ {{ line.note }}</p>
+                }
+
+                <div class="mt-2.5 flex items-center gap-3">
+                  <div class="stepper">
+                    <button
+                      type="button"
+                      (click)="cart.decrement(line.lineId)"
+                      [attr.aria-label]="'Remove one ' + line.name"
+                    >
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        class="size-3.5"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 8h10" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <output [attr.aria-label]="'Quantity of ' + line.name">{{ line.qty }}</output>
+                    <button
+                      type="button"
+                      (click)="cart.increment(line.lineId)"
+                      [disabled]="line.qty >= 20"
+                      [attr.aria-label]="'Add one more ' + line.name"
+                    >
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        class="size-3.5"
+                        aria-hidden="true"
+                      >
+                        <path d="M8 3v10M3 8h10" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="text-xs font-semibold text-accent-600 hover:underline"
+                    (click)="cart.remove(line.lineId)"
+                  >
+                    Remove<span class="sr-only"> {{ line.name }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <p class="price shrink-0 text-sm font-bold text-primary-600">
+                {{ lineTotal(line.qty, line.unitPrice) | peso }}
+              </p>
+            </li>
+          }
+        </ul>
+
+        <!-- Summary -->
+        <footer class="shrink-0 border-t border-hairline bg-secondary-50 px-5 py-5">
+          <dl class="flex items-baseline justify-between">
+            <dt class="text-sm font-semibold text-primary-600">Subtotal</dt>
+            <dd class="price text-2xl font-bold text-primary-600">
+              {{ cart.totals().subtotal | peso }}
+            </dd>
+          </dl>
+          <p class="mt-1 text-xs text-ink-muted">
+            Pay in store on pickup. No card details are collected here.
+          </p>
+
+          <button type="button" class="btn btn-primary btn-block mt-4" (click)="goToDetails()">
+            Continue
+          </button>
+          <button
+            type="button"
+            class="mt-2 w-full text-xs font-medium text-ink-muted hover:text-accent-600"
+            (click)="cart.clear()"
+          >
+            Empty the order
+          </button>
+        </footer>
+      }
+    }
+
+    <!-- ============================ STEP: DETAILS ============================ -->
+    @else {
+      <form
+        [formGroup]="form"
+        (ngSubmit)="send()"
+        class="flex grow flex-col overflow-hidden"
+        novalidate
+      >
+        <div class="grow space-y-5 overflow-y-auto overscroll-contain px-5 py-5">
+          <!-- Name -->
+          <div>
+            <label class="field-label" for="cd-name">
+              Name <span class="text-accent-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cd-name"
+              type="text"
+              formControlName="name"
+              autocomplete="name"
+              class="field mt-1.5"
+              placeholder="Who is this order for?"
+              [attr.aria-invalid]="invalid('name')"
+              [attr.aria-describedby]="invalid('name') ? 'cd-name-err' : null"
+            />
+            @if (invalid('name')) {
+              <p id="cd-name-err" class="field-error mt-1.5">
+                Please give us a name for the cup.
+              </p>
+            }
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label class="field-label" for="cd-phone">
+              Mobile number <span class="text-accent-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cd-phone"
+              type="tel"
+              inputmode="tel"
+              formControlName="phone"
+              autocomplete="tel"
+              class="field mt-1.5"
+              placeholder="0917 000 0000"
+              [attr.aria-invalid]="invalid('phone')"
+              [attr.aria-describedby]="invalid('phone') ? 'cd-phone-err' : null"
+            />
+            @if (invalid('phone')) {
+              <p id="cd-phone-err" class="field-error mt-1.5">
+                We need a reachable number in case anything runs out.
+              </p>
+            }
+          </div>
+
+          <!-- Fulfilment -->
+          <fieldset>
+            <legend class="field-label">Pickup or dine-in?</legend>
+            <div class="mt-1.5 flex gap-2" role="radiogroup" aria-label="Pickup or dine-in">
+              <button
+                type="button"
+                role="radio"
+                class="chip flex-1 justify-center"
+                [attr.aria-checked]="form.controls.fulfilment.value === 'pickup'"
+                [attr.tabindex]="form.controls.fulfilment.value === 'pickup' ? 0 : -1"
+                (click)="setFulfilment('pickup')"
+              >
+                Pickup
+              </button>
+              <button
+                type="button"
+                role="radio"
+                class="chip flex-1 justify-center"
+                [attr.aria-checked]="form.controls.fulfilment.value === 'dine-in'"
+                [attr.tabindex]="form.controls.fulfilment.value === 'dine-in' ? 0 : -1"
+                (click)="setFulfilment('dine-in')"
+              >
+                Dine-in
+              </button>
+            </div>
+          </fieldset>
+
+          <!-- Time -->
+          <div>
+            <label class="field-label" for="cd-time">When do you want it?</label>
+            <input
+              id="cd-time"
+              type="text"
+              formControlName="pickupTime"
+              class="field mt-1.5"
+              placeholder="ASAP, or 4:30 PM"
+            />
+          </div>
+
+          <!-- Notes -->
+          <div>
+            <label class="field-label" for="cd-notes">Anything else?</label>
+            <textarea
+              id="cd-notes"
+              rows="3"
+              formControlName="notes"
+              class="field mt-1.5 resize-y"
+              placeholder="Light ice, oat milk in the second latte, one bag please."
+            ></textarea>
+          </div>
+
+          <!-- Channel -->
+          <fieldset class="rounded-xl border border-hairline p-4">
+            <legend class="field-label px-1">How should we receive it?</legend>
+            <div class="mt-1 flex gap-2" role="radiogroup" aria-label="Send order via">
+              <button
+                type="button"
+                role="radio"
+                class="chip flex-1 justify-center"
+                [attr.aria-checked]="channel() === 'whatsapp'"
+                [attr.tabindex]="channel() === 'whatsapp' ? 0 : -1"
+                (click)="setChannel('whatsapp')"
+              >
+                WhatsApp
+              </button>
+              <button
+                type="button"
+                role="radio"
+                class="chip flex-1 justify-center"
+                [attr.aria-checked]="channel() === 'email'"
+                [attr.tabindex]="channel() === 'email' ? 0 : -1"
+                (click)="setChannel('email')"
+              >
+                Email
+              </button>
+            </div>
+
+            @if (channel() === 'whatsapp' && whatsappTooLong()) {
+              <p class="field-error mt-3">
+                This order is long enough that WhatsApp may cut it short. Email is safer.
+              </p>
+            } @else {
+              <p class="mt-3 text-xs/relaxed text-ink-muted">
+                We open a pre-filled message — you review it and hit send. Nothing leaves
+                your device until you do.
+              </p>
+            }
+          </fieldset>
+        </div>
+
+        <!-- Submit -->
+        <footer class="shrink-0 border-t border-hairline bg-secondary-50 px-5 py-5">
+          <dl class="flex items-baseline justify-between">
+            <dt class="text-sm font-semibold text-primary-600">
+              Subtotal
+              <span class="font-normal text-ink-muted">
+                ({{ cart.totals().itemCount }} items)
+              </span>
+            </dt>
+            <dd class="price text-xl font-bold text-primary-600">
+              {{ cart.totals().subtotal | peso }}
+            </dd>
+          </dl>
+
+          <button type="submit" class="btn btn-gold btn-block mt-4">
+            Send order via {{ channel() === 'whatsapp' ? 'WhatsApp' : 'email' }}
+          </button>
+          <button
+            type="button"
+            class="mt-2 w-full text-xs font-medium text-ink-muted hover:text-primary-600"
+            (click)="backToReview()"
+          >
+            Back to the order
+          </button>
+        </footer>
+      </form>
+    }
+  </div>
+}

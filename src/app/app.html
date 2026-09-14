@@ -1,0 +1,63 @@
+<!-- ============================================================
+     MATCHARAP — single-page app shell
+     Section order: Home · Menu · About · Gallery · Reviews · Contact
+
+     Anchor IDs for the deferred sections live on the wrapper elements, not
+     inside the components. The wrappers are always in the DOM, so the
+     scroll-spy IntersectionObserver can track them even before their content
+     has been fetched — and their min-heights stop the page from jumping as
+     each chunk arrives.
+     ============================================================ -->
+
+<!-- Skip link: first tab stop, visible only on focus -->
+<a
+  href="#menu"
+  class="sr-only-focusable top-4 left-4 z-100 rounded-full bg-secondary-400 px-5 py-3 text-sm font-semibold text-primary-800"
+>
+  Skip to menu
+</a>
+
+<app-header />
+
+<main id="main">
+  <!-- Above the fold: eager. The hero is the LCP element and the menu is the
+       primary content plus the target of every "Order now" CTA. -->
+  <app-hero />
+  <app-menu-section />
+  <app-about />
+
+  <div id="gallery">
+    @defer (on viewport) {
+      <app-gallery />
+    } @placeholder (minimum 100ms) {
+      <div class="min-h-[70vh] bg-secondary-50"></div>
+    }
+  </div>
+
+  <div id="reviews">
+    @defer (on viewport) {
+      <app-testimonials />
+    } @placeholder (minimum 100ms) {
+      <div class="min-h-[60vh] bg-white"></div>
+    }
+  </div>
+
+  <div id="contact">
+    @defer (on viewport) {
+      <app-contact />
+    } @placeholder (minimum 100ms) {
+      <div class="min-h-[70vh] bg-secondary-50"></div>
+    }
+  </div>
+</main>
+
+<app-footer />
+
+<!--
+  Order drawer. Deferred on the open flag so ReactiveFormsModule and the whole
+  checkout flow stay out of the initial bundle, then prefetched while the
+  browser is idle so the first open is still instant.
+-->
+@defer (when cart.isOpen(); prefetch on idle) {
+  <app-cart-drawer />
+}

@@ -1,0 +1,216 @@
+<!-- ============================================================
+     SITE HEADER — fixed, condenses on scroll, drawer nav on mobile
+     ============================================================ -->
+<div
+  class="border-b transition-all duration-300 ease-(--ease-brand)"
+  [class.border-primary-700/40]="!condensed()"
+  [class.bg-primary-600/95]="!condensed()"
+  [class.border-primary-800]="condensed()"
+  [class.bg-primary-700/95]="condensed()"
+  [class.shadow-lifted]="condensed()"
+  style="backdrop-filter: blur(12px)"
+>
+  <div
+    class="shell flex items-center justify-between gap-4 transition-[height] duration-300 ease-(--ease-brand)"
+    [class.h-(--header-h)]="!condensed()"
+    [class.h-16]="condensed()"
+  >
+    <!-- Wordmark -->
+    <a
+      href="#home"
+      class="group flex items-center gap-2.5"
+      [attr.aria-label]="shop.name + ' — back to top'"
+      (click)="onNavigate('home')"
+    >
+      <span
+        class="grid size-9 place-items-center rounded-full border border-secondary-400/60 font-display text-base font-semibold text-secondary-400"
+        aria-hidden="true"
+      >
+        M
+      </span>
+      <span class="font-display text-xl font-semibold tracking-tight text-white">
+        {{ shop.name }}
+      </span>
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav class="hidden lg:block" aria-label="Main">
+      <ul class="flex items-center gap-1">
+        @for (link of links; track link.id) {
+          <li>
+            <a
+              [href]="'#' + link.id"
+              class="relative block rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              [class.text-secondary-400]="active() === link.id"
+              [class.text-primary-100]="active() !== link.id"
+              [attr.aria-current]="active() === link.id ? 'true' : null"
+              (click)="onNavigate(link.id)"
+            >
+              {{ link.label }}
+              <!-- Active underline -->
+              <span
+                class="absolute inset-x-4 -bottom-0.5 h-0.5 rounded-full bg-secondary-400 transition-transform duration-300 ease-(--ease-brand)"
+                [class.scale-x-100]="active() === link.id"
+                [class.scale-x-0]="active() !== link.id"
+                aria-hidden="true"
+              ></span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2">
+      <!-- Cart trigger -->
+      <button
+        type="button"
+        class="icon-btn relative border-primary-300/30 text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+        (click)="openCart()"
+        [attr.aria-label]="
+          cart.totals().itemCount > 0
+            ? 'Open your order, ' + cart.totals().itemCount + ' items'
+            : 'Open your order, currently empty'
+        "
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 7h16l-1.3 11.2a2 2 0 0 1-2 1.8H7.3a2 2 0 0 1-2-1.8L4 7Z"
+            stroke-linejoin="round"
+          />
+          <path d="M9 7V5.5a3 3 0 0 1 6 0V7" stroke-linecap="round" />
+        </svg>
+
+        @if (cart.totals().itemCount > 0) {
+          <!-- aria-hidden: the count is already in the button's label. -->
+          <span class="cart-badge" aria-hidden="true">{{ cart.totals().itemCount }}</span>
+        }
+      </button>
+
+      <!-- Mobile menu trigger -->
+      <button
+        type="button"
+        class="icon-btn border-primary-300/30 text-primary-100 lg:hidden"
+        [attr.aria-label]="navOpen() ? 'Close navigation menu' : 'Open navigation menu'"
+        [attr.aria-expanded]="navOpen()"
+        aria-controls="mobile-nav"
+        (click)="toggleNav()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          class="size-5"
+          aria-hidden="true"
+        >
+          @if (navOpen()) {
+            <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+          } @else {
+            <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+          }
+        </svg>
+      </button>
+
+      <a href="#menu" class="btn btn-gold btn-sm hidden sm:inline-flex" (click)="onNavigate('menu')">
+        Order now
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ MOBILE NAV ============================ -->
+@if (navOpen()) {
+  <div
+    class="fixed inset-0 z-40 bg-primary-900/60 backdrop-blur-sm lg:hidden"
+    animate.enter="scrim-enter"
+    animate.leave="scrim-leave"
+    (click)="closeNav()"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    id="mobile-nav"
+    class="fixed inset-y-0 left-0 z-45 flex w-[min(20rem,85vw)] flex-col bg-primary-600 shadow-lifted lg:hidden"
+    animate.enter="panel-left-enter"
+    animate.leave="panel-left-leave"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Site navigation"
+    appFocusTrap
+  >
+    <div class="flex h-(--header-h) shrink-0 items-center px-6">
+      <span class="font-display text-lg font-semibold text-white">{{ shop.name }}</span>
+    </div>
+
+    <nav class="grow overflow-y-auto px-4 pb-6" aria-label="Mobile">
+      <ul class="space-y-1">
+        @for (link of links; track link.id) {
+          <li>
+            <a
+              [href]="'#' + link.id"
+              class="flex items-center justify-between rounded-xl px-4 py-3.5 font-display text-lg font-semibold transition-colors"
+              [class.bg-primary-700]="active() === link.id"
+              [class.text-secondary-400]="active() === link.id"
+              [class.text-primary-100]="active() !== link.id"
+              [attr.aria-current]="active() === link.id ? 'true' : null"
+              (click)="onNavigate(link.id)"
+            >
+              {{ link.label }}
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                class="size-4 opacity-50"
+                aria-hidden="true"
+              >
+                <path d="m7 4 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="shrink-0 space-y-4 border-t border-primary-700 px-6 py-6">
+      <button type="button" class="btn btn-gold btn-block btn-sm" (click)="openCart()">
+        View your order
+        @if (cart.totals().itemCount > 0) {
+          <span>({{ cart.totals().itemCount }})</span>
+        }
+      </button>
+
+      <div class="space-y-1 text-sm">
+        <a [href]="'tel:' + shop.phone" class="block text-primary-100 hover:text-secondary-400">
+          {{ shop.phoneDisplay }}
+        </a>
+        <a [href]="'mailto:' + shop.email" class="block text-primary-100 hover:text-secondary-400">
+          {{ shop.email }}
+        </a>
+      </div>
+
+      <ul class="flex gap-3">
+        @for (social of shop.socials; track social.label) {
+          <li>
+            <a
+              [href]="social.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block rounded-full border border-primary-300/30 px-3.5 py-1.5 text-xs font-medium text-primary-100 hover:border-secondary-400 hover:text-secondary-400"
+            >
+              {{ social.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}
