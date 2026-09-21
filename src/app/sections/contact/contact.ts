@@ -1,10 +1,17 @@
+// contact.ts
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SHOP } from '../../core/data';
-import { OrderService } from '../../core/services';
 import { Reveal } from '../../shared/a11y/reveal';
+import emailjs, { EmailJSResponseStatus } from '@emailjs/browser';
 
 type SubjectKey = 'general' | 'catering' | 'events' | 'feedback' | 'press';
+
+// From your EmailJS dashboard. Safe to keep client-side — EmailJS scopes
+// sending by these IDs plus rate limits, not by secrecy.
+const EMAILJS_SERVICE_ID = 'service_jvcfhlm';
+const EMAILJS_TEMPLATE_ID = 'template_fqls405';
+const EMAILJS_PUBLIC_KEY = 'aifPr1Qqz1fiN9bVl';
 
 @Component({
   selector: 'app-contact',
@@ -14,10 +21,11 @@ type SubjectKey = 'general' | 'catering' | 'events' | 'feedback' | 'press';
 })
 export class Contact {
   private readonly fb = inject(FormBuilder);
-  private readonly order = inject(OrderService);
 
   protected readonly shop = SHOP;
   protected readonly sent = signal(false);
+  protected readonly sending = signal(false);
+  protected readonly sendError = signal<string | null>(null);
 
   protected readonly subjects: readonly { value: SubjectKey; label: string }[] = [
     { value: 'general', label: 'General enquiry' },
@@ -39,33 +47,52 @@ export class Contact {
     return c.invalid && (c.touched || c.dirty);
   }
 
-  /** Remaining characters, for the message counter. */
   protected remaining(): number {
     return 1200 - this.form.controls.message.value.length;
   }
 
-  protected submit(): void {
+  protected async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    if (this.sending()) return;
 
     const { name, email, subject, message } = this.form.getRawValue();
     const label = this.subjects.find((s) => s.value === subject)?.label ?? 'Enquiry';
 
-    // There is no backend, so the form composes a mailto rather than
-    // pretending to POST somewhere. Swap this for an HTTP call when an
-    // endpoint exists — the validation and UI stay unchanged.
-    window.location.href = this.order.mailtoUrl(
-      `${label} — ${name}`,
-      [message, '', '---', `From: ${name}`, `Reply to: ${email}`].join('\n'),
-    );
+    this.sending.set(true);
+    this.sendError.set(null);
 
-    this.sent.set(true);
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          to_email: this.shop.email,
+          from_name: name,
+          from_email: email,
+          subject: `${label} — ${name}`,
+          message,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY },
+      );
+      this.sent.set(true);
+    } catch(err) {
+      console.error('EmailJS send failed:', err);
+      const detail =
+        err instanceof EmailJSResponseStatus ? `${err.status} ${err.text}` : String(err);
+      this.sendError.set(
+        `Something went wrong sending that (${detail}). Please email us directly at ${this.shop.email}.`,
+      );
+    } finally {
+      this.sending.set(false);
+    }
   }
 
   protected reset(): void {
     this.form.reset({ name: '', email: '', subject: 'general', message: '' });
     this.sent.set(false);
+    this.sendError.set(null);
   }
 }
